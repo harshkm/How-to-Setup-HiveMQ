@@ -1,0 +1,9 @@
+# HOW TO SETUP hivemqV32.0 Cluster
+# In this Document I'll give you a brief about what is HiveMQ, What are subprotocols and what are the minimal essential configuartions that are required to setup hivemq.
+# SO WHAT IS HIVEMQ?
+# In a world of IOT devices from phone to smartwatch to a tiny OBD device that controls an entire vehichle. It is very important that these devices not only operate but communicate and should be controlled asa well.
+# That's where the HiveMQ comes into picture. The HivemQ platform extends the power of MQTT, the industry standard for IoT messaging, with a complete solution for production IoT deployments.
+# HiveMQ offers a variety of library, extentions to connect any device using MQTT protocol, being the broker in between to reliably transfer data, controlling services like HiveMQ control center, HiveMQ Swarm for testing, HiveMQ datahub for enhancing your data on the go.
+#
+# ENOUGH ABOUT HIVEMQ, SO HOW TO SET UP A HIVEMQ CLUSTER?
+# FOLLOW THE STEPS AND YOU'LL ABLE TO SET UP CLUSTER ON ANY MACHINE.

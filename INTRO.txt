@@ -7,3 +7,101 @@
 #
 # ENOUGH ABOUT HIVEMQ, SO HOW TO SET UP A HIVEMQ CLUSTER?
 # FOLLOW THE STEPS AND YOU'LL ABLE TO SET UP CLUSTER ON ANY MACHINE.
+
+
+#TO BE CHANGED
+#INSTALL HIVEMQ TO CONFIGURE
+sudo su 
+yum install unzip -y
+yum install java-11-openjdk-devel -y
+yum install wget -y 
+cd /opt/
+wget https://www.hivemq.com/releases/hivemq-4.32.0.zip
+unzip hivemq-4.32.0.zip
+mv hivemq-4.32.0.zip /home/harsh_mahour_ril_com/.
+cd hivemq-4.32.0/
+vim conf/config.xml
+
+rm -rf /data/*
+
+#RUN HIVEMQ
+sudo su
+cd /data/hivemq-4.32.0/
+nohup ./bin/run.sh &
+tail -f nohup.out
+
+#CREATE MOUNT POINTS TO ATTACH TO VOLUME:
+mkfs.ext4 /dev/sdb
+mkfs.xfs -f /dev/sdb
+mkdir /data
+echo "/dev/sdb /data xfs defaults 0 0" >> /etc/fstab
+mount -a
+systemctl daemon-reload
+df -Th
+
+#ADD THIS IN run.sh for keeping CUSTOME DATA DIRECTORY
+JAVA_OPTS="$JAVA_OPTS -Dhivemq.data.folder=/data/hivemq"
+#
+
+#PLACE LICENSE
+cp hivemq-Reliance-enterprise-edition-unlimited-license-support-until-31st-Jan-2025.lic /data/hivemq-4.32.0/license/.
+
+
+FINE TUNING:
+vim /etc/security/limits.conf
+INSERT	=> 
+* soft nofile 1000000
+* hard nofile 1000000
+* soft nproc 1000000
+* hard nproc 1000000
+
+/etc/pam.d/login
+INSERT	=>	
+session required pam_limits.so
+
+/etc/sysctl.conf
+INSERT	=>	
+net.ipv4.conf.default.secure_redirects = 0
+net.ipv4.conf.all.secure_redirects = 0
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_max_syn_backlog = 16384
+net.core.netdev_max_backlog = 32768
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.ip_forward = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.icmp_ignore_bogus_error_responses = 1
+net.ipv4.conf.all.accept_source_route = 0
+net.core.rmem_default = 524288
+net.core.wmem_default = 524288
+net.core.wmem_max = 67108864
+net.core.rmem_max = 67108864
+net.ipv4.tcp_fin_timeout = 30
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+net.ipv4.tcp_moderate_rcvbuf = 0
+fs.nr_open = 1000000
+fs.file-max = 5097152
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.ip_local_port_range = 1024 65535
+kernel.pid_max = 4194303
+net.core.somaxconn = 3276
+
+#GET HIVEMQ PROMETHEUS MONITORING EXTENSIONS
+cd /data/
+wget https://github.com/hivemq/hivemq-prometheus-extension/releases/download/4.0.11/hivemq-prometheus-extension-4.0.11.zip
+unzip hivemq-prometheus-extension-4.0.11.zip -d /data/hivemq/extensions/
+
+#RUN NODE_EXPORTER
+sudo su 
+cd /data/node_exporter-1.8.2.linux-amd64
+nohup ./node_exporter --web.listen-address=0.0.0.0:9500 &
+
+#RUN PROMETHEUS
+cd /opt/prometheus-2.54.1.linux-amd64/
+nohup /opt/prometheus-2.54.1.linux-amd64/prometheus --config.file=/opt/prometheus-2.54.1.linux-amd64/prometheus.yml --storage.tsdb.path=/data/prometheus --storage.tsdb.retention.time=30d &

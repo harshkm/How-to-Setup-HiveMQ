@@ -90,7 +90,7 @@ fs.file-max = 5097152
 net.ipv4.tcp_tw_reuse = 1
 net.ipv4.ip_local_port_range = 1024 65535
 kernel.pid_max = 4194303
-net.core.somaxconn = 3276
+net.core.somaxconn = 32768
 
 #GET HIVEMQ PROMETHEUS MONITORING EXTENSIONS
 cd /data/

@@ -92,6 +92,12 @@ net.ipv4.ip_local_port_range = 1024 65535
 kernel.pid_max = 4194303
 net.core.somaxconn = 32768
 
+systemctl stop firewalld
+systemctl disable firewalld
+setenforce 0
+sed -i -e 's/enforcing/disabled/g' /etc/selinux/config
+reboot
+
 #GET HIVEMQ PROMETHEUS MONITORING EXTENSIONS
 cd /data/
 wget https://github.com/hivemq/hivemq-prometheus-extension/releases/download/4.0.11/hivemq-prometheus-extension-4.0.11.zip
